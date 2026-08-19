@@ -198,7 +198,7 @@ export default function SummaryPage() {
                     </div>
                   </div>
                   
-                  <div className="prose prose-sm prose-p:text-ink prose-p:leading-relaxed max-w-none">
+                  <div className="prose prose-sm dark:prose-invert prose-p:text-ink prose-li:text-ink prose-strong:text-ink prose-headings:text-ink prose-p:leading-relaxed max-w-none">
                     <ReactMarkdown>{item.answer}</ReactMarkdown>
                   </div>
                 </div>

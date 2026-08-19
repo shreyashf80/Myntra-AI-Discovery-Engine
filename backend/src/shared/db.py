@@ -104,6 +104,14 @@ def init_db():
             timestamp TEXT
         )
     ''')
+    
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS processed_items (
+            id TEXT PRIMARY KEY,
+            status TEXT,
+            processed_at TEXT
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -168,13 +176,48 @@ def delete_irrelevant_raw(item_id: str):
     conn.commit()
     conn.close()
 
-def delete_irrelevant_raw_batch(item_ids: List[str]):
+def delete_raw_batch(item_ids: List[str]):
     if not item_ids: return
     conn = get_connection()
     c = conn.cursor()
     c.executemany("DELETE FROM raw_items WHERE id = ?", [(i,) for i in item_ids])
     conn.commit()
     conn.close()
+
+def mark_items_processed(item_ids: List[str], status: str):
+    if not item_ids: return
+    conn = get_connection()
+    c = conn.cursor()
+    timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    c.executemany('''
+        INSERT OR REPLACE INTO processed_items (id, status, processed_at)
+        VALUES (?, ?, ?)
+    ''', [(i, status, timestamp) for i in item_ids])
+    conn.commit()
+    conn.close()
+
+def filter_unseen_items(items: List[RawItem]) -> List[RawItem]:
+    if not items: return []
+    conn = get_connection()
+    c = conn.cursor()
+    
+    # Get IDs already in raw_items or processed_items
+    ids = [i.id for i in items]
+    placeholders = ','.join(['?'] * len(ids))
+    
+    c.execute(f"SELECT id FROM raw_items WHERE id IN ({placeholders})", ids)
+    seen_in_raw = {row[0] for row in c.fetchall()}
+    
+    c.execute(f"SELECT id FROM processed_items WHERE id IN ({placeholders})", ids)
+    seen_in_processed = {row[0] for row in c.fetchall()}
+    
+    conn.close()
+    
+    all_seen = seen_in_raw.union(seen_in_processed)
+    return [i for i in items if i.id not in all_seen]
+
+def delete_irrelevant_raw_batch(item_ids: List[str]):
+    delete_raw_batch(item_ids)
 
 def insert_pipeline_stats(stats: PipelineStats):
     conn = get_connection()
@@ -243,9 +286,11 @@ def is_item_ingested(item_id: str) -> bool:
     conn = get_connection()
     c = conn.cursor()
     c.execute("SELECT 1 FROM raw_items WHERE id = ?", (item_id,))
-    row = c.fetchone()
+    row1 = c.fetchone()
+    c.execute("SELECT 1 FROM processed_items WHERE id = ?", (item_id,))
+    row2 = c.fetchone()
     conn.close()
-    return bool(row)
+    return bool(row1 or row2)
 
 def save_cached_report(report_json: str):
     import datetime

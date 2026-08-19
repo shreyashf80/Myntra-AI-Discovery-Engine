@@ -2,7 +2,7 @@ import asyncio
 import logging
 import datetime
 import uuid
-from src.shared.db import get_connection, insert_tagged_items, init_db, delete_irrelevant_raw
+from src.shared.db import get_connection, insert_tagged_items, init_db, delete_irrelevant_raw, mark_items_processed, delete_raw_batch
 from src.shared.schemas import RawItem, PipelineStats
 from src.pipeline.relevance_filter import RelevanceFilter
 from src.pipeline.extractor import Extractor
@@ -14,7 +14,11 @@ logger = logging.getLogger(__name__)
 def fetch_raw_items_by_source(source: str) -> list[RawItem]:
     conn = get_connection()
     c = conn.cursor()
-    c.execute("SELECT id, source, source_native_id, query_tags, content_type, title, body, author, rating, timestamp, url, parent_id, language_detected, language_original, ingested_at FROM raw_items WHERE source = ?", (source,))
+    c.execute('''
+        SELECT id, source, source_native_id, query_tags, content_type, title, body, author, rating, timestamp, url, parent_id, language_detected, language_original, ingested_at 
+        FROM raw_items 
+        WHERE source = ? AND id NOT IN (SELECT id FROM processed_items)
+    ''', (source,))
     rows = c.fetchall()
     conn.close()
     
@@ -60,6 +64,9 @@ async def run_for_source(source: str):
     survivors, discard_count_stage1 = RelevanceFilter.apply_stage1_filter(raw_items)
     logger.info(f"[{source}] Stage 1 Filter: {len(survivors)} survived, {discard_count_stage1} discarded.")
     
+    stage1_discarded_ids = [item.id for item in raw_items if item not in survivors]
+    mark_items_processed(stage1_discarded_ids, 'DISCARDED')
+    
     # 3. Stage 2: LLM Extraction
     if survivors:
         tagged_items, discard_count_stage2 = await Extractor.extract_all(survivors)
@@ -73,6 +80,12 @@ async def run_for_source(source: str):
             # 5. Embed and Store in ChromaDB
             embed_count = Embedder.embed_and_store(tagged_items)
             logger.info(f"[{source}] Embedded {embed_count} items into ChromaDB.")
+            
+        tagged_ids = [t.id for t in tagged_items]
+        stage2_discarded_ids = [s.id for s in survivors if s.id not in tagged_ids]
+        
+        mark_items_processed(tagged_ids, 'TAGGED')
+        mark_items_processed(stage2_discarded_ids, 'DISCARDED')
     else:
         tagged_items = []
         discard_count_stage2 = 0
@@ -90,11 +103,10 @@ async def run_for_source(source: str):
     )
     save_pipeline_stats(stats)
     
-    # 7. Purge irrelevant raw items to save space
-    discarded_ids = [item.id for item in raw_items if item.id not in {t.id for t in tagged_items}]
-    for d_id in discarded_ids:
-        delete_irrelevant_raw(d_id)
-    logger.info(f"[{source}] Purged {len(discarded_ids)} irrelevant raw items from DB.")
+    # 7. Purge ALL fetched items from the raw queue (they are now in the ledger)
+    all_fetched_ids = [item.id for item in raw_items]
+    delete_raw_batch(all_fetched_ids)
+    logger.info(f"[{source}] Purged {len(all_fetched_ids)} processed items from raw_items queue.")
     
     logger.info(f"--- Pipeline complete for {source} ---\n")
 

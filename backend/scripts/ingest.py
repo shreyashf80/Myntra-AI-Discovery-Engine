@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from src.shared.db import init_db, insert_raw_items, get_connection
+from src.shared.db import init_db, insert_raw_items, get_connection, filter_unseen_items
 from src.pipeline.cleaner import Cleaner
 
 from src.connectors.reddit import RedditConnector
@@ -50,10 +50,15 @@ async def main():
             cleaned_items = await Cleaner.clean_batch(raw_items)
             logger.info(f"{source}: {len(cleaned_items)} items survived cleaning")
             
-            # 3. Save to SQLite
-            insert_raw_items(cleaned_items)
-            total_ingested += len(cleaned_items)
-            logger.info(f"{source}: Successfully saved to DB")
+            # 3. Filter already seen items
+            unseen_items = filter_unseen_items(cleaned_items)
+            logger.info(f"{source}: {len(unseen_items)} items are new (unseen)")
+            
+            if unseen_items:
+                # 4. Save to SQLite
+                insert_raw_items(unseen_items)
+                total_ingested += len(unseen_items)
+                logger.info(f"{source}: Successfully saved {len(unseen_items)} to DB")
             
         except Exception as e:
             logger.error(f"Error running connector {source}: {e}", exc_info=True)

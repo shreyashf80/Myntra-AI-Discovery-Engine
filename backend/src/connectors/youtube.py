@@ -26,27 +26,12 @@ class YouTubeConnector(BaseConnector):
         intent_queries = getattr(config, "youtube_intent_queries", {})
         if not intent_queries:
             intent_queries = {
-                "repeat_purchase": [
-                    "Blinkit grocery haul",
-                    "Blinkit daily order"
-                ],
-                "frustrations": [
-                    "Why I stopped using Blinkit",
-                    "Blinkit delivery scam",
-                    "Blinkit bad experience"
-                ],
-                "switching_behavior": [
-                    "Blinkit vs Zepto speed test",
-                    "Blinkit vs Swiggy Instamart comparison"
-                ],
-                "category_exploration": [
-                    "Blinkit printout review",
-                    "Blinkit electronics delivery",
-                    "Blinkit makeup order"
-                ],
-                "product_discovery": [
-                    "Quick commerce India documentary",
-                    "10 minute delivery apps"
+                "wishlist_decisions": [
+                    "Myntra haul review",
+                    "Myntra vs Ajio haul",
+                    "Myntra EORS haul",
+                    "Myntra jeans review",
+                    "Myntra ethnic wear try on"
                 ]
             }
         return intent_queries

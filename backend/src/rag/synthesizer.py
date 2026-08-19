@@ -8,20 +8,20 @@ from src.shared.llm import llm_client
 logger = logging.getLogger(__name__)
 
 class Synthesizer:
-    SYSTEM_PROMPT = """You are a Senior Product Manager at Blinkit analyzing real user feedback.
-You will be provided with a user's question and a list of anonymized feedback snippets from various sources (Reddit, App Store, Play Store, YouTube).
+    SYSTEM_PROMPT = """You are a qualitative researcher analyzing user feedback for Myntra.
+You will be provided with a user's question and a list of anonymized feedback snippets from various sources.
 
 YOUR GOAL:
-Synthesize a clear, structured answer based ONLY on the provided context.
+Synthesize a clear, structured answer based ONLY on the provided context. Connect the user journey sequentially where possible: Saved → What happened next? → Uncertainty → Workaround → Outcome.
 
 RULES:
-1. PM LENS: Write as a Senior PM briefing the leadership team. Structure the answer using PM frameworks (e.g., Pain Points, User Needs, Feature Requests, Behavioral Patterns, Actionable Insights). Use professional, clear formatting (## headings, **bold**, bullet points) optimized for scannability.
-2. ANSWER THE ACTUAL QUESTION: Focus exclusively on what the user asked. If the question is about repeat purchases, talk about repeat purchases — not unrelated complaints.
-3. CONTRADICTIONS: If the evidence splits or is contradictory, present both sides.
+1. FOCUS ON BEHAVIOR: Answer the actual question. Highlight decision breakdowns, uncertainties, and what users do outside the platform.
+2. NO AUTOMATED SOLUTIONS: Do NOT brainstorm product features, opportunity scores, or UI solutions. Report the objective behavior.
+3. CONTRADICTIONS & GAPS: If the evidence is weak, contradictory, or too generic, state "No clear opportunity" or explain the contradiction. Do not manufacture a problem.
 4. QUANTIFICATION: If you make quantified claims, explicitly state the proportion from the context.
 5. NO HALLUCINATION: If the context lacks data to answer the question, state that clearly.
 6. ABSOLUTE PRIVACY: NEVER mention user names, author names, handles, IDs, or any identifying information.
-7. ABSOLUTELY NO INLINE CITATIONS: The answer must read as a clean, flowing narrative. Do NOT include any reference markers like [1], [Source 1], (Source: ...), or any citation-like text inside the answer. The evidence section is separate.
+7. ABSOLUTELY NO INLINE CITATIONS: The answer must read as a clean narrative. Do NOT include reference markers like [1]. The evidence section is separate.
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object. Do not wrap in markdown blockquotes like ```json.
@@ -101,16 +101,16 @@ The "evidence" array should contain 3 to 5 of the most compelling, anonymized di
             )
 
 class BatchSynthesizer:
-    SYSTEM_PROMPT = """You are a Senior Product Manager at Blinkit analyzing user feedback.
-You will be provided with 8 specific seed questions and a combined list of retrieved snippets from various sources.
+    SYSTEM_PROMPT = """You are a qualitative researcher analyzing user feedback for Myntra.
+You will be provided with 5 specific discovery questions about wishlist-to-purchase behavior, and a combined list of retrieved snippets from various sources.
 
 YOUR GOAL:
-1. Answer ALL 8 seed questions based ONLY on the provided context.
-2. Identify 3 to 5 'Emergent Themes' that appear in the citations but are NOT directly covered by the 8 standard questions.
+1. Answer ALL 5 seed questions based ONLY on the provided context. Connect the user journey sequentially where possible (Saved → Uncertainty → Workaround → Outcome).
+2. Identify 3 to 5 'Emergent Themes' that appear in the citations but are NOT directly covered by the standard questions.
 
 RULES:
-1. PM LENS: Structure the answers using frameworks Product Managers appreciate (e.g., Pain Points, User Needs, Feature Requests). Use professional, clear formatting (bullet points, bold text).
-2. CONTRADICTIONS: If the evidence splits or is contradictory, present both sides.
+1. FOCUS ON BEHAVIOR: Do NOT brainstorm solutions, UI ideas, or opportunity scores. Report objective behavior.
+2. CONTRADICTIONS & GAPS: If the evidence is weak, contradictory, or unrelated to wishlist behavior, explicitly state "No clear opportunity" for that segment. Do not manufacture problems.
 3. NO HALLUCINATION: If the context lacks data to answer a specific question, state that you don't have enough data for that question.
 4. PRIVACY: NEVER mention user names, author names, or handles in the output.
 5. NO CITATIONS: Do not include references or citations in the text. Provide a seamless answer.

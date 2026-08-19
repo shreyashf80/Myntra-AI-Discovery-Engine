@@ -105,7 +105,7 @@ export default function SummaryPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Blinkit_Discovery_Report.md';
+    a.download = 'Myntra_Discovery_Report.md';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

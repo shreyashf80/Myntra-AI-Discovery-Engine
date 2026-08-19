@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     ADMIN_SECRET: str = "super_secret_admin_token"
     YOUTUBE_API_KEY: str = ""
     SERPAPI_KEY: str = ""
+    APIFY_API_TOKEN: str = ""
     
     reddit_intent_queries: dict = {}
     reddit_subreddits: list = []

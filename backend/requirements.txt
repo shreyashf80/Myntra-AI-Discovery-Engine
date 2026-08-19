@@ -17,3 +17,4 @@ emoji
 deep-translator
 numpy<2.0
 scikit-learn==1.4.2
+apify-client==1.8.1

@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 class Extractor:
     BATCH_SIZE = 25
 
-    SYSTEM_PROMPT = """You are a qualitative research AI analyzing user feedback for Blinkit (a quick commerce app in India).
-Your task is to structure the provided batch of reviews/comments against a specific research taxonomy.
+    SYSTEM_PROMPT = """You are a qualitative research AI analyzing user feedback for Myntra (a fashion e-commerce app).
+Your task is to structure the provided batch of reviews/comments against a specific research taxonomy focused on wishlist-to-purchase conversion.
 
 OUTPUT FORMAT:
 You must return a raw JSON array. DO NOT wrap it in markdown blockquotes like ```json.
@@ -20,37 +20,38 @@ You must return a raw JSON array. DO NOT wrap it in markdown blockquotes like ``
   {
     "id": "review_id_1",
     "relevant": true/false,
-    "category_mentioned": ["Fruits & Vegetables", ...],
-    "behavior_type": "repeat-purchase" | "habit" | "one-time-try" | "abandoned-attempt" | "never-tried" | "null",
-    "discovery_channel": "app home feed" | "search" | "ad" | "word-of-mouth" | "social media" | "other" | "null",
-    "barrier_type": "trust/quality doubt" | "price anchoring" | "lack of info" | "delivery/logistics concern" | "no need perceived" | "other" | "null",
-    "frustration": {"summary": "brief summary", "severity": "low"|"med"|"high"},
-    "unmet_need": "free text or null",
-    "segment_signal": "student" | "working professional" | "homemaker/family shopper" | "elderly/senior" | "not stated",
+    "category_mentioned": ["Men's Apparel", "Accessories", ...],
+    "journey_stage": "pre-purchase" | "comparison" | "purchase" | "post-purchase" | "unknown",
+    "wishlist_intent": ["genuine purchase consideration", "compare/shortlist", "waiting for sale", "event/occasion planning", "inspiration/moodboard", "unknown"],
+    "primary_barrier": "fit/size" | "fabric/quality" | "styling" | "price/sale hesitation" | "return-policy concern" | "comparison/analysis paralysis" | "delivery/timing concern" | "other" | "unknown",
+    "information_need": "free text or null (e.g. fit, size, styling, reviews)",
+    "external_validation_sought": "Reddit" | "YouTube" | "Instagram" | "friends/family" | "Google" | "offline store" | "competitor platform" | "none" | "unknown",
+    "workaround": "free text or null (what does the user currently do instead of getting the answer directly from the platform?)",
+    "purchase_outcome": "purchased wishlisted item" | "purchased alternative" | "postponed" | "abandoned" | "unknown",
+    "conversion_trigger": "event/occasion" | "social validation" | "low stock" | "price change" | "information/uncertainty resolved" | "recommendation" | "other" | "unknown",
+    "wishlist_purchase_link": "direct" | "indirect" | "contextual" | "none",
     "sentiment": "positive" | "neutral" | "negative",
     "source_snippet": "exact quote from the review that justifies the tags"
   }
 ]
 
-CANONICAL CATEGORIES (Use ONLY these, or 'other', or 'not stated'):
-- Core: Fruits & Vegetables, Dairy & Bakery, Snacks & Beverages, Staples/Grocery, Personal Care & Cleaning
-- Exploratory: Electronics & Accessories, Beauty & Skincare, Pharmacy/Health, Baby Care, Pet Care, Stationery & Print, Home & Kitchen, Books
-
 RULES:
-1. If the item is generic noise, spam, or a pure technical bug (e.g., "app crashes", "otp failed") with no category/behavior signal, set "relevant": false and you can leave other fields null.
-2. If it is relevant, set "relevant": true and fill out all fields. Use "null" (JSON null, not string "null") if the information is not present.
-3. For `frustration`, if none, set to null.
-4. Ensure the `id` perfectly matches the id provided in the input batch.
+1. Wishlist Intent can contain multiple values if evidence supports it.
+2. DO NOT infer conversion triggers or purchase outcomes when the source does not explicitly state one. Use "unknown".
+3. Clearly separate users discussing products before purchase (pre-purchase/consideration) from people reviewing products they already bought (post-purchase).
+4. Objectively capture price/sale behaviour if present, do not filter it out.
+5. If the item is generic noise, spam, or a pure technical bug with no shopping/wishlist/consideration signal, set "relevant": false and you can leave other fields null.
+6. Ensure the `id` perfectly matches the id provided in the input batch.
 """
 
     @classmethod
     def _categorize_tier(cls, cats: List[str]) -> List[str]:
-        core = ["Fruits & Vegetables", "Dairy & Bakery", "Snacks & Beverages", "Staples/Grocery", "Personal Care & Cleaning"]
-        exploratory = ["Electronics & Accessories", "Beauty & Skincare", "Pharmacy/Health", "Baby Care", "Pet Care", "Stationery & Print", "Home & Kitchen", "Books"]
+        from src.shared.taxonomy import classify_category_tier
         tiers = set()
         for c in cats:
-            if c in core: tiers.add("core")
-            if c in exploratory: tiers.add("exploratory")
+            t = classify_category_tier(c)
+            if t != "unknown":
+                tiers.add(t)
         return list(tiers) if tiers else ["not stated"]
 
     @classmethod
@@ -100,12 +101,15 @@ RULES:
                     source=original.source,
                     category_mentioned=cat_mentioned,
                     category_tier=cls._categorize_tier(cat_mentioned),
-                    behavior_type=ext.get("behavior_type"),
-                    discovery_channel=ext.get("discovery_channel"),
-                    barrier_type=ext.get("barrier_type"),
-                    frustration=frustration,
-                    unmet_need=ext.get("unmet_need"),
-                    segment_signal=ext.get("segment_signal", "not stated"),
+                    journey_stage=ext.get("journey_stage", "unknown"),
+                    wishlist_intent=ext.get("wishlist_intent", ["unknown"]) if isinstance(ext.get("wishlist_intent"), list) else [ext.get("wishlist_intent", "unknown")],
+                    primary_barrier=ext.get("primary_barrier", "unknown"),
+                    information_need=ext.get("information_need", "unknown") or "unknown",
+                    external_validation_sought=ext.get("external_validation_sought", "unknown"),
+                    workaround=ext.get("workaround", "unknown") or "unknown",
+                    purchase_outcome=ext.get("purchase_outcome", "unknown"),
+                    conversion_trigger=ext.get("conversion_trigger", "unknown"),
+                    wishlist_purchase_link=ext.get("wishlist_purchase_link", "none"),
                     sentiment=ext.get("sentiment", "neutral"),
                     source_snippet=ext.get("source_snippet", ""),
                     body=original.body,

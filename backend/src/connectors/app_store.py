@@ -19,7 +19,7 @@ class AppStoreConnector(BaseConnector):
         from src.shared.config import config as app_config
         from src.shared.db import get_connector_state, save_connector_state, is_item_ingested
         
-        app_id = getattr(config, "app_store_app_id", "960335206")
+        app_id = getattr(config, "app_store_app_id", "907394059")
         count = getattr(config, "app_store_count", 25)
         api_key = app_config.SERPAPI_KEY
         

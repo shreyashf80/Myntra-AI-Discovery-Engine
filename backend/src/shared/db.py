@@ -7,11 +7,7 @@ from src.shared.config import config
 from src.shared.schemas import RawItem, TaggedItem, PipelineStats
 
 def get_connection():
-    # Make sure DATA_DIR exists
     if not os.path.exists(config.DATA_DIR):
-        # We handle this gracefully because in some environments (like Railway) 
-        # it might be an absolute path that we can't create if missing, 
-        # or it might be a relative path locally.
         try:
             os.makedirs(config.DATA_DIR, exist_ok=True)
         except Exception:
@@ -45,18 +41,22 @@ def init_db():
         )
     ''')
     
+    # Updated to new Myntra TaggedItem schema
     c.execute('''
         CREATE TABLE IF NOT EXISTS tagged_items (
             id TEXT PRIMARY KEY,
             source TEXT,
             category_mentioned TEXT,
             category_tier TEXT,
-            behavior_type TEXT,
-            discovery_channel TEXT,
-            barrier_type TEXT,
-            frustration TEXT,
-            unmet_need TEXT,
-            segment_signal TEXT,
+            journey_stage TEXT,
+            wishlist_intent TEXT,
+            primary_barrier TEXT,
+            information_need TEXT,
+            external_validation_sought TEXT,
+            workaround TEXT,
+            purchase_outcome TEXT,
+            conversion_trigger TEXT,
+            wishlist_purchase_link TEXT,
             sentiment TEXT,
             source_snippet TEXT,
             body TEXT,
@@ -129,13 +129,15 @@ def insert_tagged_item(item: TaggedItem):
     c = conn.cursor()
     c.execute('''
         INSERT OR REPLACE INTO tagged_items 
-        (id, source, category_mentioned, category_tier, behavior_type, discovery_channel, barrier_type, frustration, unmet_need, segment_signal, sentiment, source_snippet, body, timestamp, rating, url, extraction_model, extracted_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (id, source, category_mentioned, category_tier, journey_stage, wishlist_intent, primary_barrier, information_need, external_validation_sought, workaround, purchase_outcome, conversion_trigger, wishlist_purchase_link, sentiment, source_snippet, body, timestamp, rating, url, extraction_model, extracted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         item.id, item.source, json.dumps(item.category_mentioned), json.dumps(item.category_tier), 
-        item.behavior_type, item.discovery_channel, item.barrier_type, json.dumps(item.frustration), 
-        item.unmet_need, item.segment_signal, item.sentiment, item.source_snippet, item.body, 
-        item.timestamp, item.rating, item.url, item.extraction_model, item.extracted_at
+        item.journey_stage, json.dumps(item.wishlist_intent), item.primary_barrier, 
+        item.information_need, item.external_validation_sought, item.workaround, 
+        item.purchase_outcome, item.conversion_trigger, item.wishlist_purchase_link, 
+        item.sentiment, item.source_snippet, item.body, item.timestamp, item.rating, 
+        item.url, item.extraction_model, item.extracted_at
     ))
     conn.commit()
     conn.close()
@@ -146,13 +148,15 @@ def insert_tagged_items(items: List[TaggedItem]):
     for item in items:
         c.execute('''
             INSERT OR REPLACE INTO tagged_items 
-            (id, source, category_mentioned, category_tier, behavior_type, discovery_channel, barrier_type, frustration, unmet_need, segment_signal, sentiment, source_snippet, body, timestamp, rating, url, extraction_model, extracted_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (id, source, category_mentioned, category_tier, journey_stage, wishlist_intent, primary_barrier, information_need, external_validation_sought, workaround, purchase_outcome, conversion_trigger, wishlist_purchase_link, sentiment, source_snippet, body, timestamp, rating, url, extraction_model, extracted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             item.id, item.source, json.dumps(item.category_mentioned), json.dumps(item.category_tier), 
-            item.behavior_type, item.discovery_channel, item.barrier_type, json.dumps(item.frustration), 
-            item.unmet_need, item.segment_signal, item.sentiment, item.source_snippet, item.body, 
-            item.timestamp, item.rating, item.url, item.extraction_model, item.extracted_at
+            item.journey_stage, json.dumps(item.wishlist_intent), item.primary_barrier, 
+            item.information_need, item.external_validation_sought, item.workaround, 
+            item.purchase_outcome, item.conversion_trigger, item.wishlist_purchase_link, 
+            item.sentiment, item.source_snippet, item.body, item.timestamp, item.rating, 
+            item.url, item.extraction_model, item.extracted_at
         ))
     conn.commit()
     conn.close()

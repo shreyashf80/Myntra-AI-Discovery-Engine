@@ -1,20 +1,15 @@
 CORE_CATEGORIES = frozenset([
-    "Fruits & Vegetables", 
-    "Dairy & Bakery", 
-    "Snacks & Beverages", 
-    "Staples/Grocery", 
-    "Personal Care & Cleaning"
+    "Men's Apparel", 
+    "Women's Apparel", 
+    "Kids' Apparel", 
+    "Footwear"
 ])
 
 EXPLORATORY_CATEGORIES = frozenset([
-    "Electronics & Accessories", 
-    "Beauty & Skincare", 
-    "Pharmacy/Health", 
-    "Baby Care", 
-    "Pet Care", 
-    "Stationery & Print", 
-    "Home & Kitchen", 
-    "Books"
+    "Accessories", 
+    "Beauty & Personal Care", 
+    "Jewelry",
+    "Home & Living"
 ])
 
 def classify_category_tier(category: str) -> str:

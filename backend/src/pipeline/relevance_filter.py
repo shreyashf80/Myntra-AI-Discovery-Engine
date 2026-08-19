@@ -9,17 +9,14 @@ class RelevanceFilter:
     TECH_NOISE_KEYWORDS = ["crash", "lag", "freeze", "login", "otp", "payment", "glitch", "bug", "server error", "stuck", "server down"]
     
     BEHAVIOR_KEYWORDS = [
-        "try", "order", "quality", "trust", "category", "scam", "fraud", "fake", 
-        "rotten", "expired", "delayed", "delivery", "price", "support", "refund", 
-        "cost", "expensive", "cheap", "first time", "always", "compare", "brand"
+        "wishlist", "saved", "cart", "later", "compare", "decide", "shortlist",
+        "price", "sale", "eors", "return", "review", "haul", "ajio", "nykaa",
+        "waiting", "too expensive", "worth it", "budget", "help me choose", "suggestions"
     ]
     
     CATEGORY_KEYWORDS = [
-        "grocery", "groceries", "electronics", "makeup", "vegetables", "fruits", 
-        "dairy", "bakery", "milk", "bread", "snacks", "beverages", "staples", 
-        "personal care", "cleaning", "beauty", "skincare", "pharmacy", "health", 
-        "baby care", "pet care", "stationery", "print", "home", "kitchen", "books",
-        "medicines", "toys", "phone", "laptop", "charger"
+        "fit", "size", "quality", "fabric", "length", "material", "transparent",
+        "jeans", "dresses", "footwear", "ethnic wear", "accessories", "style", "look"
     ]
 
     @staticmethod

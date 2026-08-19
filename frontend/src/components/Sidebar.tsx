@@ -47,8 +47,8 @@ export function Sidebar() {
   return (
     <div className="w-full md:w-[220px] bg-bg border-b md:border-b-0 md:border-r border-surface h-auto md:h-screen flex flex-row md:flex-col fixed left-0 top-0 z-50 items-center md:items-stretch">
       <div className="p-4 md:border-b border-surface flex-shrink-0 flex items-center space-x-3">
-        <img src="/logo.png" alt="Blinkit Echo Logo" className="w-8 h-8 object-contain rounded-[4px]" />
-        <h1 className="font-sans font-semibold text-[18px] text-ink">Blinkit Echo</h1>
+        <img src="/logo.png" alt="Myntra Echo Logo" className="w-8 h-8 object-contain rounded-[4px]" />
+        <h1 className="font-sans font-semibold text-[18px] text-ink">Myntra Echo</h1>
       </div>
       
       <nav className="flex-1 p-2 md:p-4 flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto">

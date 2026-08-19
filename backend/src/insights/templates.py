@@ -9,42 +9,27 @@ class SeedQuestion:
 SEED_QUESTIONS: List[SeedQuestion] = [
     SeedQuestion(
         id="q1",
-        text="Why do users repeatedly buy from the same categories?",
-        expected_signals=["habit", "convenience", "quality", "trust"]
+        text="Why did users save/wishlist the product? (Wishlist behaviour)",
+        expected_signals=["genuine purchase consideration", "compare/shortlist", "waiting for sale", "event/occasion", "inspiration"]
     ),
     SeedQuestion(
         id="q2",
-        text="What prevents users from exploring new categories?",
-        expected_signals=["price", "quality doubt", "lack of info", "trust"]
+        text="What prevents them from purchasing and what uncertainty remains? (Decision friction)",
+        expected_signals=["fit/size", "fabric/quality", "styling", "price/sale hesitation", "return-policy"]
     ),
     SeedQuestion(
         id="q3",
-        text="How do users discover products today?",
-        expected_signals=["search", "ad", "word-of-mouth", "social media", "app home feed"]
+        text="Are they comparing alternatives and what happens after saving? (Decision process)",
+        expected_signals=["comparison", "analysis paralysis", "myntra vs ajio"]
     ),
     SeedQuestion(
         id="q4",
-        text="What role do habits play in shopping behavior?",
-        expected_signals=["repeat-purchase", "routine", "loyalty"]
+        text="What information do they seek and where do they go? (External behaviour)",
+        expected_signals=["Reddit", "YouTube", "Instagram", "friends", "offline store"]
     ),
     SeedQuestion(
         id="q5",
-        text="What information do users need before trying a new category?",
-        expected_signals=["reviews", "ingredients", "brand", "return policy"]
-    ),
-    SeedQuestion(
-        id="q6",
-        text="What frustrations emerge repeatedly?",
-        expected_signals=["delivery", "quality", "support", "refund", "app crash"]
-    ),
-    SeedQuestion(
-        id="q7",
-        text="Which user segments are more likely to experiment?",
-        expected_signals=["student", "young professional", "tech-savvy"]
-    ),
-    SeedQuestion(
-        id="q8",
-        text="What unmet needs emerge consistently across discussions?",
-        expected_signals=["unmet_need", "wish", "feature request", "complaint"]
+        text="Did they purchase, postpone, abandon, or buy an alternative? (Outcome)",
+        expected_signals=["purchased", "purchased alternative", "postponed", "abandoned"]
     )
 ]

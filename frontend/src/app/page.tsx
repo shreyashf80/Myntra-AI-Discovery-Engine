@@ -24,17 +24,19 @@ type Message = {
 };
 
 const EXAMPLE_QUESTIONS = [
-  "What stops users from trying a new category on Blinkit?",
-  "Why do users keep reordering from the same categories?",
-  "What information do users need before trying something new on Blinkit?",
+  "Why do users add fashion products to their wishlist?",
+  "What prevents wishlisted products from eventually being purchased?",
+  "What uncertainties remain after users have identified a product they like?",
 ];
 
 const ADDITIONAL_QUESTIONS = [
-  "How do users discover products today?",
-  "What role do habits play in shopping behavior?",
-  "What frustrations emerge repeatedly?",
-  "Which user segments are more likely to experiment?",
-  "What unmet needs emerge consistently across discussions?"
+  "What causes users to postpone a purchase?",
+  "How do users compare multiple shortlisted products?",
+  "What information do users seek outside Myntra/AJIO before purchasing?",
+  "What role do fit, size, styling, price, reviews, occasion and social validation play?",
+  "When do users use the wishlist as genuine purchase intent versus simply as a bookmarking mechanism?",
+  "How do these behaviors differ across user segments?",
+  "What unmet needs emerge consistently across user conversations?"
 ];
 
 
@@ -262,9 +264,7 @@ export default function ChatPage() {
 
   const dropdownQuestions = messages.length === 0 
     ? ADDITIONAL_QUESTIONS 
-    : [...EXAMPLE_QUESTIONS, ...ADDITIONAL_QUESTIONS].filter(
-        q => !messages.some(m => m.role === "user" && m.content === q)
-      );
+    : [...EXAMPLE_QUESTIONS, ...ADDITIONAL_QUESTIONS];
 
   return (
     <div className="flex flex-col h-screen max-w-[860px] mx-auto relative">
@@ -291,7 +291,7 @@ export default function ChatPage() {
                   Objective
                 </h2>
                 <p className="text-[15px] font-sans text-ink leading-relaxed">
-                  Drive product decisions using the authentic voice of the customer. Echo instantly synthesizes raw feedback across App Store, Play Store, Reddit, and YouTube into actionable insights—helping you confidently steer Blinkit's roadmap with real, data-backed evidence.
+                  Drive product decisions using the authentic voice of the customer. Echo instantly synthesizes raw feedback across App Store, Play Store, Reddit, and YouTube into actionable insights—helping you confidently steer Myntra's wishlist-to-purchase roadmap with real, data-backed evidence.
                 </p>
                 <div className="mt-4 text-[12px] font-mono text-ink-muted flex items-center space-x-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent" />
@@ -404,7 +404,7 @@ export default function ChatPage() {
                 handleSubmit(input);
               }
             }}
-            placeholder="Ask about your customers. e.g. What prevents users from exploring new categories?"
+            placeholder="Ask about your customers. e.g. What prevents users from purchasing wishlisted items?"
             className="w-full min-h-[56px] max-h-[120px] bg-surface border border-[#E7E5DE] rounded-[10px] pl-6 pr-14 py-4 text-[15px] leading-6 text-ink placeholder:text-ink-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent resize-none custom-scrollbar"
             rows={1}
           />

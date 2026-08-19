@@ -36,12 +36,15 @@ class TaggedItem(BaseModel):
     source: str
     category_mentioned: List[str]
     category_tier: List[str]
-    behavior_type: Optional[str] = None
-    discovery_channel: Optional[str] = None
-    barrier_type: Optional[str] = None
-    frustration: Dict[str, Optional[str]]
-    unmet_need: Optional[str] = None
-    segment_signal: Optional[str] = None
+    journey_stage: str
+    wishlist_intent: List[str]
+    primary_barrier: str
+    information_need: str
+    external_validation_sought: str
+    workaround: str
+    purchase_outcome: str
+    conversion_trigger: str
+    wishlist_purchase_link: str
     sentiment: str
     source_snippet: str
     body: str

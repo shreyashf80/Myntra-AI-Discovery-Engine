@@ -12,23 +12,13 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 class IngestionConfig:
-    # Reddit config
-    reddit_subreddits = ["india", "bangalore", "delhi", "mumbai", "pune", "hyderabad", "chennai", "kolkata"]
-    reddit_queries_scoped = ["blinkit"]
-    reddit_queries_wide = ["zepto vs blinkit", "blinkit scam", "blinkit delay"]
-    
     # Play Store config
-    play_store_app_id = "com.grofers.customerapp"
-    play_store_count = 5000
+    play_store_app_id = "com.myntra.android"
+    play_store_count = 20
     
     # App Store config
-    app_store_app_id = "960335206"
-    app_store_pages = 5
-    
-    # YouTube config
-    youtube_queries = ["blinkit review", "blinkit case study", "zepto blinkit comparison"]
-    youtube_max_videos_per_query = 20
-    youtube_max_comments_per_video = 100
+    app_store_app_id = "907394059"
+    app_store_pages = 1
 
 async def main():
     logger.info("Initializing database...")

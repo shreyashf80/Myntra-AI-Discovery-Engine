@@ -9,9 +9,9 @@ from src.pipeline.cleaner import Cleaner
 from src.shared.schemas import RawItem
 
 class MockConfig:
-    play_store_app_id = "com.grofers.customerapp"
+    play_store_app_id = "com.myntra.android"
     play_store_count = 25
-    app_store_app_id = "534536254"
+    app_store_app_id = "907394059"
     app_store_pages = 1
 
 async def main():

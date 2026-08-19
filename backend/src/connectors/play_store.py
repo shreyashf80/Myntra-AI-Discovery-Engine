@@ -20,7 +20,7 @@ class PlayStoreConnector(BaseConnector):
     async def fetch(self, config: Any) -> List[RawItem]:
         from src.shared.db import get_connector_state, save_connector_state, is_item_ingested
         
-        app_id = getattr(config, "play_store_app_id", "com.grofers.customerapp")
+        app_id = getattr(config, "play_store_app_id", "com.myntra.android")
         count = getattr(config, "play_store_count", 100)
         
         state = get_connector_state(self.source_name)

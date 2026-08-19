@@ -17,8 +17,8 @@ const ibmMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Blinkit Echo",
-  description: "Internal insights console for Blinkit product teams.",
+  title: "Myntra Echo",
+  description: "Internal insights console for Myntra product teams.",
 };
 
 export default function RootLayout({

@@ -3,7 +3,10 @@ import logging
 import datetime
 from typing import List, Dict, Any
 import urllib.parse
-from apify_client import ApifyClient
+try:
+    from apify_client import ApifyClient
+except ImportError:
+    ApifyClient = None
 
 from src.connectors.base import BaseConnector
 from src.shared.schemas import RawItem
@@ -84,6 +87,10 @@ class RedditConnector(BaseConnector):
 
     async def fetch(self, config: Any) -> List[RawItem]:
         from src.shared.config import config as app_config
+        if ApifyClient is None:
+            logger.error("apify-client is not properly installed. Cannot run Reddit scraper.")
+            return []
+            
         token = app_config.APIFY_API_TOKEN
         if not token:
             logger.error("APIFY_API_TOKEN is not set. Cannot run Reddit scraper.")

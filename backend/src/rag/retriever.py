@@ -1,4 +1,5 @@
 import logging
+import sqlite3
 from typing import List, Dict, Optional
 from src.pipeline.embedder import Embedder
 from src.shared.schemas import RetrievedItem
@@ -11,8 +12,9 @@ MAX_DISTANCE = 1.3
 
 class Retriever:
     @classmethod
-    def retrieve(cls, question: str, filters: Optional[Dict] = None, k: int = 15) -> List[RetrievedItem]:
-        client = Embedder.get_chroma_client()
+    def _query(cls, question: str, filters: Optional[Dict], k: int, client=None):
+        if client is None:
+            client = Embedder.get_chroma_client()
         model = Embedder.get_model()
         collection = client.get_or_create_collection("discovery_engine")
         
@@ -66,3 +68,14 @@ class Retriever:
         
         logger.info(f"Retrieved {len(retrieved)} relevant items (filtered from {len(results['ids'][0]) if results['ids'] else 0} candidates)")
         return retrieved
+
+    @classmethod
+    def retrieve(cls, question: str, filters: Optional[Dict] = None, k: int = 15) -> List[RetrievedItem]:
+        try:
+            return cls._query(question, filters, k)
+        except sqlite3.OperationalError as e:
+            logger.warning(f"ChromaDB disk I/O error, rebuilding client and retrying: {e}")
+            # Force a fresh ChromaDB client connection
+            fresh_client = Embedder.get_chroma_client(force_new=True)
+            return cls._query(question, filters, k, client=fresh_client)
+

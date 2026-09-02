@@ -88,8 +88,8 @@ The "evidence" array should contain 3 to 5 of the most compelling, anonymized di
             logger.error(f"Synthesis failed: {error_msg}")
             
             # Formulate a helpful message based on the error
-            if "429" in error_msg or "quota" in error_msg.lower() or "rate limit" in error_msg.lower():
-                display_answer = "API Rate Limit Exceeded: All configured LLM providers are currently out of quota."
+            if "429" in error_msg or "503" in error_msg or "quota" in error_msg.lower() or "rate limit" in error_msg.lower() or "unavailable" in error_msg.lower() or "high demand" in error_msg.lower():
+                display_answer = "The AI service is temporarily unavailable due to high demand. Please try again in a moment."
             else:
                 display_answer = f"Sorry, I encountered an error while synthesizing the answer: {error_msg}"
                 
@@ -170,8 +170,8 @@ CRITICAL: The `answer` field must be a valid JSON string. All newlines in the ma
             logger.error(f"Batch Synthesis failed: {error_msg}")
             
             # Formulate a helpful message based on the error
-            if "429" in error_msg or "quota" in error_msg.lower() or "rate limit" in error_msg.lower():
-                display_answer = "API Rate Limit Exceeded: All configured LLM providers are currently out of quota."
+            if "429" in error_msg or "503" in error_msg or "quota" in error_msg.lower() or "rate limit" in error_msg.lower() or "unavailable" in error_msg.lower() or "high demand" in error_msg.lower():
+                display_answer = "The AI service is temporarily unavailable due to high demand. Please try again in a moment."
             else:
                 display_answer = f"Sorry, I encountered an error while synthesizing the batch answer: {error_msg}"
                 

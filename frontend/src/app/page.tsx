@@ -224,7 +224,11 @@ export default function ChatPage() {
       });
 
       if (!res.ok) {
-        throw new Error("The engine hit a rate limit. Try again in a moment.");
+        if (res.status === 429) {
+          throw new Error("The engine hit a rate limit. Try again in a moment.");
+        }
+        const errText = await res.text();
+        throw new Error(errText || `Server error (${res.status})`);
       }
 
       const data = await res.json();

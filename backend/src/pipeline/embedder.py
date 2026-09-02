@@ -22,8 +22,8 @@ class Embedder:
         return cls._model
 
     @classmethod
-    def get_chroma_client(cls):
-        if cls._chroma_client is None:
+    def get_chroma_client(cls, force_new=False):
+        if cls._chroma_client is None or force_new:
             os.makedirs(config.CHROMA_DIR, exist_ok=True)
             cls._chroma_client = chromadb.PersistentClient(path=config.CHROMA_DIR)
         return cls._chroma_client

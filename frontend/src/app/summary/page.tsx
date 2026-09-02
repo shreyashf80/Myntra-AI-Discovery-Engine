@@ -29,7 +29,9 @@ export default function SummaryPage() {
   useEffect(() => {
     const fetchCache = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/summary");
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+        const endpoint = backendUrl ? `${backendUrl}/api/summary` : "/api/summary";
+        const res = await fetch(endpoint);
         if (res.ok) {
           const data = await res.json();
           setSummary(data);

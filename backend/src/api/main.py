@@ -9,22 +9,27 @@ app = FastAPI(title="Blinkit Discovery Engine API")
 import os
 
 # Setup CORS
-# Allowing localhost for local development, and dynamic FRONTEND_URL for production
+# Allowing localhost for local development, Vercel deployments, and dynamic FRONTEND_URL for production
 allowed_origins = [
     "http://localhost:3000", 
     "http://127.0.0.1:3000",
 ]
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
-    allowed_origins.append(frontend_url)
+    for url in frontend_url.split(","):
+        cleaned = url.strip().rstrip("/")
+        if cleaned and cleaned not in allowed_origins:
+            allowed_origins.append(cleaned)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins, 
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
